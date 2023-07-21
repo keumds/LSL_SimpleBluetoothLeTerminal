@@ -11,6 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+//anhive
+//import edu.ucsd.sccn.LSL;
 
 final class TextUtil {
 
@@ -66,8 +70,81 @@ final class TextUtil {
             if(c >= 10) c += 'A'-10;
             else        c += '0';
             sb.append((char)c);
+
+            // Convert hex string to decimal
+            String hexString = sb.substring(sb.length() - 2);
+            //int decimal = hexStringToDecimal(hexString);
+            //System.out.println("Decimal: " + decimal);
+            //try {
+            //    LSL_sender(decimal);
+            //} catch (IOException e) {
+            //    throw new RuntimeException(e);
+            //} catch (InterruptedException e) {
+            //    throw new RuntimeException(e);
+            //}
         }
     }
+
+    public static int hexStringToDecimal(String hexString) {
+        int decimal = 0;
+        for (int i = 0; i < hexString.length(); i++) {
+            char c = hexString.charAt(i);
+            if (c >= '0' && c <= '9') {
+                decimal = decimal * 16 + (c - '0');
+            } else if (c >= 'A' && c <= 'F') {
+                decimal = decimal * 16 + (c - 'A' + 10);
+            } else if (c >= 'a' && c <= 'f') {
+                decimal = decimal * 16 + (c - 'a' + 10);
+            } else {
+                // Invalid character, handle accordingly (e.g., throw an exception)
+            }
+        }
+        return decimal;
+    }
+
+ //   private static LSL.StreamInfo info;
+ //   private static LSL.StreamOutlet outlet;
+
+ /*   private static void initializeLSL() {
+        System.out.println("Creating a new StreamInfo...");
+        //LSL.StreamInfo info = new LSL.StreamInfo("Bio","EEG",1,100,LSL.ChannelFormat.float32,"myuid777");
+        info = new LSL.StreamInfo("Bio", "EEG", 1, 100, LSL.ChannelFormat.float32, "myuid777_");
+
+        System.out.println("Creating an outlet...");
+        try {
+            outlet = new LSL.StreamOutlet(info);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+*/
+/*    private static void LSL_sender(int decimal) throws IOException, InterruptedException  {
+       System.out.println("Creating a new StreamInfo...");
+        //LSL.StreamInfo info = new LSL.StreamInfo("Bio","EEG",1,100,LSL.ChannelFormat.float32,"myuid777");
+        LSL.StreamInfo info = new LSL.StreamInfo("Bio", "EEG", 1, 100, LSL.ChannelFormat.float32, "myuid777_");
+
+        System.out.println("Creating an outlet...");
+        LSL.StreamOutlet outlet = new LSL.StreamOutlet(info);
+
+        if (info == null || outlet == null) {
+            initializeLSL(); // LSL 객체가 초기화되지 않은 경우 초기화
+        }
+
+        System.out.println("Sending data...");
+        float[] sample = new float[1];
+        for (int t=0;t<1;t++) {
+            for (int k=0;k<1;k++)
+//                sample[k] = (float)Math.random()*50-25;
+                sample[k] = (float) decimal;
+            outlet.push_sample(sample);
+            Thread.sleep(10);
+        }
+
+        //outlet.close();
+        //info.destroy();
+    }
+*/
+
 
     /**
      * use https://en.wikipedia.org/wiki/Caret_notation to avoid invisible control characters

@@ -12,7 +12,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/hex"
-        android:title="HEX Mode"
         android:checkable="true"
+        android:title="Send LSL"
         app:showAsAction="never" />
 </menu>

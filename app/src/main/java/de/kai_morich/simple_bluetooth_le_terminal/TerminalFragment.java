@@ -30,9 +30,12 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayDeque;
 
+//anhive
+//import BCI2LSL
+
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener {
 
-    private enum Connected { False, Pending, True }
+    private enum Connected {False, Pending, True}
 
     private String deviceAddress;
     private SerialService service;
@@ -47,6 +50,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private boolean pendingNewline = false;
     private String newline = TextUtil.newline_crlf;
 
+    private BCI2LSL bci2LSL;
     /*
      * Lifecycle
      */
@@ -56,6 +60,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         setHasOptionsMenu(true);
         setRetainInstance(true);
         deviceAddress = getArguments().getString("device");
+        bci2LSL = new BCI2LSL();
+
     }
 
     @Override
@@ -69,7 +75,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     @Override
     public void onStart() {
         super.onStart();
-        if(service != null)
+        if (service != null)
             service.attach(this);
         else
             getActivity().startService(new Intent(getActivity(), SerialService.class)); // prevents service destroy on unbind from recreated activity caused by orientation change
@@ -77,12 +83,13 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     @Override
     public void onStop() {
-        if(service != null && !getActivity().isChangingConfigurations())
+        if (service != null && !getActivity().isChangingConfigurations())
             service.detach();
         super.onStop();
     }
 
-    @SuppressWarnings("deprecation") // onAttach(context) was added with API 23. onAttach(activity) works for all API versions
+    @SuppressWarnings("deprecation")
+    // onAttach(context) was added with API 23. onAttach(activity) works for all API versions
     @Override
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
@@ -91,14 +98,17 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     @Override
     public void onDetach() {
-        try { getActivity().unbindService(this); } catch(Exception ignored) {}
+        try {
+            getActivity().unbindService(this);
+        } catch (Exception ignored) {
+        }
         super.onDetach();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(initialStart && service != null) {
+        if (initialStart && service != null) {
             initialStart = false;
             getActivity().runOnUiThread(this::connect);
         }
@@ -108,7 +118,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     public void onServiceConnected(ComponentName name, IBinder binder) {
         service = ((SerialService.SerialBinder) binder).getService();
         service.attach(this);
-        if(initialStart && isResumed()) {
+        if (initialStart && isResumed()) {
             initialStart = false;
             getActivity().runOnUiThread(this::connect);
         }
@@ -170,6 +180,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             hexWatcher.enable(hexEnabled);
             sendText.setHint(hexEnabled ? "HEX mode" : "");
             item.setChecked(hexEnabled);
+
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -198,14 +209,14 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     private void send(String str) {
-        if(connected != Connected.True) {
+        if (connected != Connected.True) {
             Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
             return;
         }
         try {
             String msg;
             byte[] data;
-            if(hexEnabled) {
+            if (hexEnabled) {
                 StringBuilder sb = new StringBuilder();
                 TextUtil.toHexString(sb, TextUtil.fromHexString(str));
                 TextUtil.toHexString(sb, newline.getBytes());
@@ -229,6 +240,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         for (byte[] data : datas) {
             if (hexEnabled) {
                 spn.append(TextUtil.toHexString(data)).append('\n');
+                //anhive
+                bci2LSL.Open_BCI(data, 0, data.length);
             } else {
                 String msg = new String(data);
                 if (newline.equals(TextUtil.newline_crlf) && msg.length() > 0) {
@@ -236,7 +249,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                     msg = msg.replace(TextUtil.newline_crlf, TextUtil.newline_lf);
                     // special handling if CR and LF come in separate fragments
                     if (pendingNewline && msg.charAt(0) == '\n') {
-                        if(spn.length() >= 2) {
+                        if (spn.length() >= 2) {
                             spn.delete(spn.length() - 2, spn.length());
                         } else {
                             Editable edt = receiveText.getEditableText();
@@ -249,6 +262,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                 spn.append(TextUtil.toCaretString(msg, newline.length() != 0));
             }
         }
+        if(receiveText.length() > 1000)
+            receiveText.setText("");   // DS by Cho
+
         receiveText.append(spn);
     }
 
@@ -289,5 +305,5 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         status("connection lost: " + e.getMessage());
         disconnect();
     }
-
 }
+
