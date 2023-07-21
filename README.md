@@ -1,5 +1,14 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3f9ba45b5c5449179150010659311f57)](https://www.codacy.com/manual/kai-morich/SimpleBluetoothLeTerminal?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kai-morich/SimpleBluetoothLeTerminal&amp;utm_campaign=Badge_Grade)
 
+# Add Function LSL Sender, OpenBCI Parser
+  1. LSL Sender & OpenBCI Parser on BCI2LSL.java
+  2. Add STM32WG5M
+
+# Origin From
+  https://github.com/kai-morich/SimpleBluetoothLeTerminal
+  
+  https://github.com/labstreaminglayer/liblsl-Java
+  
 # SimpleBluetoothLeTerminal
 
 This Android app provides a line-oriented terminal / console for Bluetooth LE (4.x) devices implementing a custom serial profile
